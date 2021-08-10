@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<flow name="get:\checkVaccine:sfdc-covid-services-api-config" doc:id="6c5c4e36-810b-46bb-a0bf-e1ec5181b4e5" >
+		<logger level="INFO" doc:name="Logger" doc:id="b8ab545f-eb97-4c6f-a0e7-65cc2c6067e2" message='#["Request Received Please check the Parameters Passed"]'/>
+		<logger level="DEBUG" doc:name="Logger" doc:id="268ab269-8f1b-4378-807e-66f614e16943" message='#["Request Received Payload Please check the Parameters Passed"]'/>
+		
+			<choice doc:name="Choice" doc:id="add1ba22-6cdb-4d64-bb2a-bc433c1882f6">
+			<when expression="#[attributes.queryParams.pinCode != null and attributes.queryParams.date != null]">
+				<logger level="INFO" doc:name="Logger" doc:id="9e65bea8-e397-496d-9e01-3badf795973c" />
+			</when>
+			<when expression="#[attributes.queryParams.pinCode != null and attributes.queryParams.date == null]">
+				<logger level="INFO" doc:name="Logger" doc:id="198682a8-ebda-41ab-b9bc-6d57e614c6a7" />
+				<os:retrieve doc:name="Retrieve" doc:id="50baa0b0-5668-4c36-bcb2-184dc228abb3" objectStore="Object_store" key="dateStamp" target="dateStamp">
+			<os:default-value><![CDATA[#[now() as Date as String {format: "dd-MM-yyy"}]]]></os:default-value>
+		</os:retrieve>
+				<logger level="INFO" doc:name="Logger" doc:id="e63c1564-eb27-4093-85ec-f1ccc85e489d" message='#["retrieved date"]' />
+			</when>
+				<when expression="#[attributes.queryParams.pinCode == null]">
+				<logger level="INFO" doc:name="Logger" doc:id="9f5abd1a-4ab4-472b-8551-2953382e0b1d" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="2704a8f8-cf6e-4169-9b56-a50eca00d401" message='#["error Raised"]' />
+			</otherwise>
+		</choice>
+		
+		<ee:transform doc:name="Transform Message" doc:id="756c2b04-eca6-4ff7-a9ed-2bbfea12a868" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="acceptAttributes" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"pincode": attributes.queryParams.pinCode,
+	"date": if ( attributes.queryParams.date != null ) (attributes.queryParams.date) else if(attributes.queryParams.date == null ) vars.dateStamp else (vars.dateStamp != null)
+}
+
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="covid Service" doc:id="a45de0be-ad2a-4bdb-9047-77bedefd11b5" config-ref="HTTP_Request_configuration" path="/findByPin">
+			<http:query-params><![CDATA[#[output application/java
+---
+vars.acceptAttributes]]]></http:query-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="ec20cfc6-0656-4b01-914a-b1797114e6b2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="dfb388e2-63b0-4922-aea2-6e13bcde943b" message="#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ac5168c6-b7a3-4a98-bd1c-9f0a7484546c" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="76c1dbc9-da67-408d-9f71-7d1a5d9454f7">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message" : "PLEASE PROVIDE YOUR PINCODE"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

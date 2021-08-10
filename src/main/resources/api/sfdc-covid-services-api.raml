@@ -1,0 +1,26 @@
+#%RAML 1.0
+title: covid-vaccine-services-api
+version: v1
+protocols: [HTTPS]
+mediaType: application/json
+
+
+/checkVaccine:
+  get:
+    displayName: check Vaccine
+    description: checking Vaccine as per the Pin Code
+    queryParameters:
+      pinCode:
+        type: string
+        example: '677999'
+        required: false
+      date:
+        type: string
+        example : '06-05-2021'
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            
+      

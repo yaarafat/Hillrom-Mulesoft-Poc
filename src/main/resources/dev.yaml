@@ -1,0 +1,10 @@
+http:
+  port: '8081'
+
+api:
+  version: 'v1'
+  
+covid:
+  port: '443'
+  host: 'cdn-api.co-vin.in'
+  basePath: '/api/v2/appointment/sessions/public'
