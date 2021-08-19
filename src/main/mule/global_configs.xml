@@ -17,10 +17,5 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 		<http:request-connection protocol="HTTPS" host="${covid.host}" port="${covid.port}" />
 	</http:request-config>
 	<configuration-properties doc:name="Configuration properties" doc:id="e040bfbb-1872-4988-a424-0e4f9ebf6d6f" file="dev.yaml" />
-	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="e20ecfb3-42a5-4ccb-ad22-22e311a3262e" >
-		<jms:active-mq-connection username="admin" password="admin">
-			<jms:factory-configuration brokerUrl="tcp://localhost:61616"/>
-		</jms:active-mq-connection>
-	</jms:config>
-	<api-gateway:autodiscovery apiId="17121578" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="a466a24e-1142-4e9d-a18c-185ad938cc8a" flowRef="sfdc-covid-services-api-main" />
+
 </mule>
