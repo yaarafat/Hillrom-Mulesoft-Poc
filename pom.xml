@@ -35,14 +35,13 @@
 				<configuration>
 					<cloudHubDeployment>
 						<uri>https://anypoint.mulesoft.com</uri>
-						<muleVersion>${mule.version}</muleVersion>
-						<username>${anypoint.username}</username>
-						<password>${anypoint.password}</password>
-						<environment>${env}</environment>
-						<applicationName>${appname}</applicationName>
-						<buisnessGroup>${business}</buisnessGroup>
-						<workerType>${vCore}</workerType>
-						<workers>${workers}</workers>
+						<muleVersion>4.3.0</muleVersion>
+						<username>DemoAccount123</username>
+						<password>Jan@2020</password>
+						<environment>Sandbox</environment>
+						<applicationName>covid-vaccine-service-api</applicationName>
+						<workerType>Micro</workerType>
+						<workers>1</workers>
 						<objectStoreV2>true</objectStoreV2>
 					</cloudHubDeployment>
 					<classifier>mule-application</classifier>
