@@ -1,0 +1,32 @@
+{
+    "sessions": [
+        {
+            "center_id": 174633,
+            "name": "Faridabad Medical Center",
+            "address": "458 Sector 21 B",
+            "state_name": "Haryana",
+            "district_name": "Faridabad",
+            "block_name": "Faridabad",
+            "pincode": 121001,
+            "from": "09:00:00",
+            "to": "16:30:00",
+            "lat": 0,
+            "long": 0,
+            "fee_type": "Free",
+            "session_id": "cb39bd97-0945-44c2-99c1-b69a2597b9a8",
+            "date": "06-05-2021",
+            "available_capacity": 50,
+            "available_capacity_dose1": 0,
+            "available_capacity_dose2": 0,
+            "fee": "0",
+            "min_age_limit": 45,
+            "vaccine": "COVISHIELD",
+            "slots": [
+                "09:00AM-10:00AM",
+                "10:00AM-11:00AM",
+                "11:00AM-12:00PM",
+                "12:00PM-04:30PM"
+            ]
+        }
+    ]
+}

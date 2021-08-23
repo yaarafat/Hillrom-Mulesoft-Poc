@@ -13,6 +13,10 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<http:request-connection host="localhost" port="8081" />
 	</http:request-config>
 	<munit:test name="implementation-test-suite-get:\checkVaccine:sfdc-covid-services-api-configTest" doc:id="b9a7e3a9-0156-4971-9acd-c4a73c360500" description="Test">
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="sfdc-covid-services-api-main" />
+			<munit:enable-flow-source value="get:\checkVaccine:sfdc-covid-services-api-config" />
+		</munit:enable-flow-sources>
 		<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock when" doc:id="da542192-51be-489c-800e-3746565bba3e" processor="http:request">
 				<munit-tools:with-attributes >
@@ -21,7 +25,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 					<munit-tools:with-attribute whereValue="a45de0be-ad2a-4bdb-9047-77bedefd11b5" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return >
-					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_response/priceBookResponse.json')]" />
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_response/covidResponse.json')]" mediaType="application/json" />
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
 		</munit:behavior>
@@ -35,6 +39,9 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 }]]]></http:query-params>
 			</http:request>
 		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="7fb9041b-8b48-46e9-8903-cbff708ec1cd" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
 	</munit:test>
 
 
