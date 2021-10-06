@@ -1,8 +1,16 @@
 http:
   port: '8081'
   
+mule:
+  env : 'prod'
+  
 api:
   version: 'v1'
+  
+json:
+  logger.application.version : '2.0.1'
+  logger.application.name : 'covid-vaccine-service-api'
+
   
 covid:
   port: '443'

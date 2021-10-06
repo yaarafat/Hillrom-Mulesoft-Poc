@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:dxcsp="http://www.mulesoft.org/schema/mule/dxcsp" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/dxcsp http://www.mulesoft.org/schema/mule/dxcsp/current/mule-dxcsp.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 	<flow name="get:\checkVaccine:sfdc-covid-services-api-config" doc:id="6c5c4e36-810b-46bb-a0bf-e1ec5181b4e5" >
-		<logger level="INFO" doc:name="Logger" doc:id="b8ab545f-eb97-4c6f-a0e7-65cc2c6067e2" message='#["Request Received Please check the Parameters Passed"]'/>
-		<logger level="DEBUG" doc:name="Logger" doc:id="268ab269-8f1b-4378-807e-66f614e16943" message='#["Request Received Payload Please check the Parameters Passed"]'/>
-		
-			<choice doc:name="Choice" doc:id="add1ba22-6cdb-4d64-bb2a-bc433c1882f6">
+		<json-logger:logger doc:id="9759eeec-cfa2-4f53-8a33-bb07f5abd104" config-ref="JSON_Logger_Config" message='#["Request Received Please check the Parameters Passed"]'/>
+		<choice doc:name="Choice" doc:id="add1ba22-6cdb-4d64-bb2a-bc433c1882f6">
 			<when expression="#[attributes.queryParams.pinCode != null and attributes.queryParams.date != null]">
-				<logger level="INFO" doc:name="Logger" doc:id="9e65bea8-e397-496d-9e01-3badf795973c" />
+				<json-logger:logger doc:name="Logger" doc:id="56763c64-88a4-4d8c-937b-6e74cfe9a0e5" config-ref="JSON_Logger_Config" message='#["Pincode and Date Received"]' priority="DEBUG"/>
 			</when>
 			<when expression="#[attributes.queryParams.pinCode != null and attributes.queryParams.date == null]">
-				<logger level="INFO" doc:name="Logger" doc:id="198682a8-ebda-41ab-b9bc-6d57e614c6a7" />
 				<os:retrieve doc:name="Retrieve" doc:id="50baa0b0-5668-4c36-bcb2-184dc228abb3" objectStore="Object_store" key="dateStamp" target="dateStamp">
 			<os:default-value><![CDATA[#[now() as Date as String {format: "dd-MM-yyy"}]]]></os:default-value>
 		</os:retrieve>
-				<logger level="INFO" doc:name="Logger" doc:id="e63c1564-eb27-4093-85ec-f1ccc85e489d" message='#["retrieved date"]' />
+				<json-logger:logger doc:name="Logger" doc:id="a356492d-ef15-4847-8a5c-9c1fb890f8f5" config-ref="JSON_Logger_Config" message='#["retrieved date"]' priority="DEBUG"/>
 			</when>
 				<when expression="#[attributes.queryParams.pinCode == null]">
-				<logger level="INFO" doc:name="Logger" doc:id="9f5abd1a-4ab4-472b-8551-2953382e0b1d" />
+				<json-logger:logger doc:name="Logger" doc:id="49635af6-b5f7-4c7c-ba90-f3fb3067654b" config-ref="JSON_Logger_Config" message='#["Pincode is null"]' priority="DEBUG"/>
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Logger" doc:id="2704a8f8-cf6e-4169-9b56-a50eca00d401" message='#["error Raised"]' />
+				<json-logger:logger doc:name="Logger" doc:id="2a613b75-db61-479b-bb38-e0040d70d3fd" config-ref="JSON_Logger_Config" message='#["error Raised"]' priority="DEBUG"/>
 			</otherwise>
 		</choice>
-		
-		<ee:transform doc:name="Transform Message" doc:id="756c2b04-eca6-4ff7-a9ed-2bbfea12a868" >
-			<ee:message >
+		<ee:transform doc:name="Transform Message" doc:id="756c2b04-eca6-4ff7-a9ed-2bbfea12a868">
+			<ee:message>
 			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="acceptAttributes" ><![CDATA[%dw 2.0
+			<ee:variables>
+				<ee:set-variable variableName="acceptAttributes"><![CDATA[%dw 2.0
 output application/json
 ---
 {
@@ -51,17 +52,17 @@ output application/json
 ---
 vars.acceptAttributes]]]></http:query-params>
 		</http:request>
-		<ee:transform doc:name="Transform Message" doc:id="ec20cfc6-0656-4b01-914a-b1797114e6b2" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<ee:transform doc:name="Transform Message" doc:id="ec20cfc6-0656-4b01-914a-b1797114e6b2">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="dfb388e2-63b0-4922-aea2-6e13bcde943b" message="#[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="e404af8d-9384-4787-83d0-5f0cd55e7d1b" name="implementationFlow"/>
 		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ac5168c6-b7a3-4a98-bd1c-9f0a7484546c" type="ANY">
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ac5168c6-b7a3-4a98-bd1c-9f0a7484546c" type="HTTP:SERVICE_UNAVAILABLE">
 				<ee:transform doc:name="Transform Message" doc:id="76c1dbc9-da67-408d-9f71-7d1a5d9454f7">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
@@ -73,6 +74,42 @@ output application/json
 					</ee:message>
 				</ee:transform>
 			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f70a0256-bbcb-4e0d-ba1c-308040f7e8b5" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="e6d53044-eaa8-43b3-bf7d-4f060fdf76bd">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "An Error has Occurred, kindly retry after sometime"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
 		</error-handler>
+	</flow>
+	<flow name="implementationFlow" doc:id="532eb641-ac39-4761-b9a2-d9b6b4431a7c" >
+		<jms:publish doc:name="Publish" doc:id="8a48844c-c331-4f52-844b-bc277c664727" config-ref="JMS_Config" destination="CovidService"/>
+		<ee:transform doc:name="Transform Message" doc:id="608a7260-d43e-4249-bbde-c8198c07c7a5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv separator = ",", quoteValues = true
+fun replaceComma(fieldValue) = if(fieldValue != null) (fieldValue replace "," with "','") else if(fieldValue == null) (null) else null
+---
+payload.sessions map {
+    center_id :$.center_id,
+    name : $.name,
+    vaccine : $.vaccine,
+    address : $.address,
+    pincode : $.pincode,
+    from : $.from,
+    to : $.to,
+    date : $.date,
+    slot : replaceComma($.slots joinBy(","))
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="cf0dcd04-edc1-4f65-94fd-188c3c7a4c65" config-ref="File_Config" path="C:\Users\yaarafat\Desktop\New folder\File_Connector\covid_Vaccine_details.csv"/>
+		<json-logger:logger doc:name="Logger" doc:id="f4544b30-59fe-482b-932a-2b13f4def3d2" config-ref="JSON_Logger_Config" message='#["Response received from Covid vaccine Service"]' />
 	</flow>
 </mule>
