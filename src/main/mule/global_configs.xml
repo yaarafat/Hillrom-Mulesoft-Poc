@@ -21,15 +21,9 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 	</http:request-config>
 	<configuration-properties doc:name="Configuration properties" doc:id="e040bfbb-1872-4988-a424-0e4f9ebf6d6f" file="dev.yaml" />
 	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="3739390b-4894-458f-8763-95cf9c311332" environment="${mule.env}"/>
-	<vm:config name="VM_Config" doc:name="VM Config" doc:id="f7f6759e-770d-47ef-ba4d-17320660a73c" >
-		<vm:connection />
-		<vm:queues >
-			<vm:queue queueName="covid_vaccine" queueType="PERSISTENT" />
-		</vm:queues>
-	</vm:config>
 	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="c6f25558-5184-4fca-9633-4a1f51d759bb" >
 		<jms:active-mq-connection username="admin" password="admin">
-			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+			<jms:factory-configuration brokerUrl="tcp://LIN80018169:61616" />
 		</jms:active-mq-connection>
 	</jms:config>
 	<file:config name="File_Config" doc:name="File Config" doc:id="ec460252-446c-4bb3-85be-b2d1285c2f7b" >

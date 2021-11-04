@@ -52,6 +52,7 @@ output application/json
 ---
 vars.acceptAttributes]]]></http:query-params>
 		</http:request>
+		<jms:publish doc:name="Publish" doc:id="8a48844c-c331-4f52-844b-bc277c664727" config-ref="JMS_Config" destination="CovidService" persistentDelivery="true" timeToLive="10" timeToLiveUnit="MINUTES"/>
 		<ee:transform doc:name="Transform Message" doc:id="ec20cfc6-0656-4b01-914a-b1797114e6b2">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
@@ -60,7 +61,8 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<flow-ref doc:name="Flow Reference" doc:id="e404af8d-9384-4787-83d0-5f0cd55e7d1b" name="implementationFlow"/>
+		<json-logger:logger doc:name="Logger" doc:id="49a48d51-4dc2-4148-b6a6-fa61048506aa" config-ref="JSON_Logger_Config" message='#["published to ActiveMQ"]'/>
+		<flow-ref doc:name="Flow Reference" doc:id="b8c82789-ab82-4936-9c77-3bda7451b90b" name="implementationFlow"/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ac5168c6-b7a3-4a98-bd1c-9f0a7484546c" type="HTTP:SERVICE_UNAVAILABLE">
 				<ee:transform doc:name="Transform Message" doc:id="76c1dbc9-da67-408d-9f71-7d1a5d9454f7">
@@ -88,11 +90,32 @@ output application/json
 			</on-error-propagate>
 		</error-handler>
 	</flow>
-	<flow name="implementationFlow" doc:id="532eb641-ac39-4761-b9a2-d9b6b4431a7c" >
-		<jms:publish doc:name="Publish" doc:id="8a48844c-c331-4f52-844b-bc277c664727" config-ref="JMS_Config" destination="CovidService"/>
-		<ee:transform doc:name="Transform Message" doc:id="608a7260-d43e-4249-bbde-c8198c07c7a5" >
+	<flow name="implementationFlow" doc:id="3262b8dd-ad80-419f-8c1e-31e2df760e73" initialState="started">
+		<jms:consume doc:name="Consume" doc:id="08e0206e-8ef4-42d9-ae8f-7df585ee0a2f" config-ref="JMS_Config" destination="CovidService" contentType="application/json" encoding="UTF-8" >
+			<jms:consumer-type >
+				<jms:queue-consumer />
+			</jms:consumer-type>
+		</jms:consume>
+		<json-logger:logger doc:name="Logger" doc:id="3e942a34-ba9a-4c93-b668-636a02b7e461" config-ref="JSON_Logger_Config" message='#["Consumed from ActiveMq Queue"]' />
+		<ee:transform doc:name="Transform Message" doc:id="6d3f8174-f791-4d71-b071-706fad431304" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.sessions map {
+    center_id :$.center_id,
+    name : $.name,
+    vaccine : $.vaccine,
+    address : $.address,
+    pincode : $.pincode,
+    from : $.from,
+    to : $.to,
+    date : $.date,
+    slot : $.slots joinBy(",")
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="storeInFile" ><![CDATA[%dw 2.0
 output application/csv separator = ",", quoteValues = true
 fun replaceComma(fieldValue) = if(fieldValue != null) (fieldValue replace "," with "','") else if(fieldValue == null) (null) else null
 ---
@@ -106,10 +129,12 @@ payload.sessions map {
     to : $.to,
     date : $.date,
     slot : replaceComma($.slots joinBy(","))
-}]]></ee:set-payload>
-			</ee:message>
+}]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
-		<file:write doc:name="Write" doc:id="cf0dcd04-edc1-4f65-94fd-188c3c7a4c65" config-ref="File_Config" path="C:\Users\yaarafat\Desktop\New folder\File_Connector\covid_Vaccine_details.csv"/>
-		<json-logger:logger doc:name="Logger" doc:id="f4544b30-59fe-482b-932a-2b13f4def3d2" config-ref="JSON_Logger_Config" message='#["Response received from Covid vaccine Service"]' />
+		<file:write doc:name="Write" doc:id="a31f4966-9564-4f9c-8792-7f46043e7b53" config-ref="File_Config" path="C:\Users\yaarafat\Desktop\New folder\File_Connector\covid_Vaccine_details.csv" >
+			<file:content ><![CDATA[#[vars.storeInFile]]]></file:content>
+		</file:write>
+		<json-logger:logger doc:name="Logger" doc:id="c13b3ec8-2f27-492e-b842-aa3bb3017511" config-ref="JSON_Logger_Config" message='#["Response received from Covid vaccine Service"]' />
 	</flow>
 </mule>
